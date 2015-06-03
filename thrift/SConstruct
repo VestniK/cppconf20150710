@@ -1,0 +1,50 @@
+import re;
+
+thriftFileRe = re.compile('(.*)\.thrift')
+thriftService = re.compile('service\s+([_a-zA-Z][_a-zA-Z0-9]*)\s+{', re.M)
+
+def thriftCreateEmitedNode(src, strPath, env):
+	tgt = env.File(strPath);
+	env.Depends(tgt, src)
+	return tgt
+
+def thriftEmitter(target, source, env):
+	for src in source:
+		for tgt in target:
+			if str(tgt) == thriftFileRe.sub('\\1', str(src)):
+				target.remove(tgt)
+				break
+		target.append(thriftCreateEmitedNode(src, thriftFileRe.sub('gen-cpp/\\1_constants.h', str(src)), env))
+		target.append(thriftCreateEmitedNode(src, thriftFileRe.sub('gen-cpp/\\1_constants.cpp', str(src)), env))
+		target.append(thriftCreateEmitedNode(src, thriftFileRe.sub('gen-cpp/\\1_types.h', str(src)), env))
+		target.append(thriftCreateEmitedNode(src, thriftFileRe.sub('gen-cpp/\\1_types.cpp', str(src)), env))
+		
+		services = thriftService.findall(src.get_text_contents())
+		for service in services:
+			target.append(thriftCreateEmitedNode(src, "gen-cpp/%s.h"%service, env))
+			target.append(thriftCreateEmitedNode(src, "gen-cpp/%s.cpp"%service, env))
+			env.Clean("gen-cpp/%s_server.skeleton.cpp"%service, 'gen-cpp')
+	env.AppendUnique(CPPPATH = 'gen-cpp')
+	return target,source
+
+env = Environment(CXXFLAGS='-Wall -Werror -std=c++11')
+env.ParseConfig('pkg-config --cflags --libs thrift-nb')
+env.ParseConfig('pkg-config --cflags --libs libevent')
+
+env['BUILDERS']['Thrift'] = Builder(
+	action = 'thrift --gen cpp:cob_style $SOURCES',
+	src_suffix = '.thrift',
+	emitter = thriftEmitter
+)
+
+thriftsrc = env.Thrift([
+	'test.thrift'
+])
+env.Program('web-server', [
+	'web-server.cpp',
+	thriftsrc
+])
+env.Program('client', [
+	'client.cpp',
+	thriftsrc
+])

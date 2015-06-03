@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Browser test</title>
+  </head>
+  <body>
+    <input type="button" id="all" value="All users" ><br/>
+    <input type="button" id="byId" value="User by ID" >
+    <input type="text" id="userId" value="" >
+    <div id="output"></div>
+
+    <script src="thrift.js"></script>
+    <script src="gen-js/test_types.js"></script>
+    <script src="gen-js/UserManager.js"></script>
+    <script>
+      (function() {
+        var transport = new Thrift.TXHRTransport("/api/");
+        var protocol  = new Thrift.TJSONProtocol(transport);
+        var client    = new UserManagerClient(protocol);
+        var idElement = document.getElementById("userId");
+        var outputElement = document.getElementById("output");
+        document.getElementById("all")
+          .addEventListener("click", function(){
+            client.all(function(result) {
+              outputElement.innerHTML = JSON.stringify(result);
+            });
+          });
+        document.getElementById("byId")
+          .addEventListener("click", function(){
+            client.get(idElement.value, function(result) {
+              outputElement.innerHTML = JSON.stringify(result);
+            });
+          });
+      })();
+    </script>
+  </body>
+</html>
