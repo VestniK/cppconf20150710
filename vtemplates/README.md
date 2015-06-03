@@ -5,28 +5,31 @@
 
 Пример работы программы:
 
-   [vestnik@VestniK-laptop build]$ ./bin/cli 
-   list
-   Available functions:
-    * add
-    * containsBar
-    * containsFoo
-    * div
-    * list
-    * mod
-    * mul
-    * set
-    * sub
-   add 1546 4747
-   6293
-   set QWE 16354
-   OK
-   div ${QWE} 23
-   711
-   div ewrhg 65
-   Error: T Context::parse(const std::string &) [T = int]: Failed to parse argument 'ewrhg'
-   containsFoo ${QWE}
-   false
-   containsFoo nofoobar
-   true
+```
+[vestnik@VestniK-laptop build]$ ./bin/cli 
+list
+Available functions:
+ * add
+ * containsBar
+ * containsFoo
+ * div
+ * list
+ * mod
+ * mul
+ * set
+ * sub
+add 1546 4747
+6293
+set QWE 16354
+OK
+div ${QWE} 23
+711
+div ewrhg 65
+Error: T Context::parse(const std::string &) [T = int]: Failed to parse argument 'ewrhg'
+containsFoo ${QWE}
+false
+containsFoo nofoobar
+true
+```
+   
 Движок обработчика командной строки занимает чуть больше полсотни строк и позволяет просовывать в скрипт произвольную функцию или константный метод объекта произвольного типа. В сигнатуре регистрируемой функции могут использоваться любые типы для которых определены операторы извлечения и вставки в поток. Вывод типа регистрируемой функции производится компилятором и не требует дополнительных действий.
