@@ -1,2 +1,3 @@
-# cppconf20150710
-Examples of thrift dispatcher and variadic template dispatcher for C++ conference
+# Примеры для встречи C++ клуба 10.07.2015 организуемой Яндексом
+
+Примеры использования Apache Thrift и шаблонного диспетчера запросов на базе которых строился доклад: "Динамическая диспетчеризация вызовов в C++".
